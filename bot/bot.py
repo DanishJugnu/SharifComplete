@@ -150,9 +150,9 @@ async def confess(interaction, content: str = None):
     if interaction.user.id in data["blocked"]:
         return await interaction.response.send_message("You have been blocked from confessing.", ephemeral=True)
 
-    emb = discord.Embed(color=discord.Color.random(), title="Sharif Sabha")
+    emb = discord.Embed(color=discord.Color.random(), title=f"Sharif Sabha Confession no. #{data['count']}")
     data["count"] += 1
-    emb.set_footer(text=f"Conferssion no. #{data['count']}, If this confession is ToS-breaking or overtly hateful, you can report it ")
+    emb.set_footer(text=f"If this confession is ToS-breaking or overtly hateful, you can report it to Sharif Sabha Staff")
     emb.set_thumbnail(url="https://cdn.discordapp.com/icons/1104365324582793318/a_7457fcf4ca011dd5db45a0ebb069dcea.gif")
 
     with open("storage.json", "w") as f:
