@@ -20,7 +20,9 @@ bot = commands.Bot(command_prefix="!!", case_insensitive=True, intents=intents,
                    strip_after_prefix=True)
 
 slash = bot.tree
-
+last_user = {}
+count=0
+cchannel_id = 1104365327711748202
 
 class Body(Modal, title='Anonymous Message Editor'):
     content = discord.ui.TextInput(
@@ -78,6 +80,41 @@ async def on_ready():
     print("User ID: ", bot.user.id)
     await bot.change_presence(activity=discord.Game(name='Sharif sabha'))
     await slash.sync(guild=discord.Object(id=GUILD_ID))
+
+@bot.event
+async def on_message(message):
+    global count
+
+    # Ignore messages sent by the bot itself to prevent recursion
+    if message.author == bot.user:
+        return
+
+    # Check if the message is in the specified channel
+    if message.channel.id == cchannel_id:
+        # Check if the message content is a number
+        if message.content.isdigit():
+            # Check if the same user sent the current count
+            if message.author.id in last_user and last_user[message.author.id] == count:
+                await message.delete()
+                error=await message.channel.send(f"{message.author.mention}You cannot count in a row!")
+                await asyncio.sleep(5)
+                await error.delete()
+                return
+
+            # Convert the message content to an integer
+            num = int(message.content)
+
+            # Check if the number is the next count
+            if num == count + 1:
+                count = num
+                last_user[message.author.id] = count
+                await message.add_reaction('✅')
+                
+            else:
+                await message.add_reaction('❌')
+                await message.channel.send(f"{message.author.mention} RUINED IT AT {count + 1}!!. Next number is 1.")
+                count = 0
+                last_user.clear()
 
 intents = discord.Intents.all()
 intents.reactions = True
